@@ -14,29 +14,30 @@ class CustomPytorchObjective:
                         targets: Sequence[float],
                         weights: Sequence[float] = None
                         ) -> List[Tuple[float, float]]:
+        """  Calculates first and second derivatives of the objective (-loss) w.r.t preds.  """
         preds = torch.FloatTensor(preds).requires_grad_()
         targets = torch.FloatTensor(targets)
 
         objective = - self.loss_function(preds, targets)
-        der1, der2 = self._calculate_derivatives(objective, preds)
+        deriv1, deriv2 = self._calculate_derivatives(objective, preds)
 
         if weights is not None:
             weights = np.asarray(weights)
-            der1, der2 = weights * der1, weights * der2
+            deriv1, deriv2 = weights * deriv1, weights * deriv2
 
-        result = list(zip(der1, der2))
+        result = list(zip(deriv1, deriv2))
         return result
 
     @staticmethod
     def _calculate_derivatives(objective: Tensor, preds: Tensor) -> Tuple[np.ndarray, np.ndarray]:
-        der1, = torch.autograd.grad(objective, preds, create_graph=True)
+        deriv1, = torch.autograd.grad(objective, preds, create_graph=True)
 
-        der2 = []
+        deriv2 = []
         for i in range(len(preds)):
-            der2_i, = torch.autograd.grad(der1[i], preds, create_graph=True)
-            der2_i = der2_i[i].item()
-            der2.append(der2_i)
+            deriv2_i, = torch.autograd.grad(deriv1[i], preds, retain_graph=True)
+            deriv2_i = deriv2_i[i].item()
+            deriv2.append(deriv2_i)
 
-        der1 = der1.detach().numpy()
-        der2 = np.array(der2)
-        return der1, der2
+        deriv1 = deriv1.detach().numpy()
+        deriv2 = np.array(deriv2)
+        return deriv1, deriv2
