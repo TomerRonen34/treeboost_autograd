@@ -6,7 +6,7 @@ from sklearn.datasets import load_boston
 from sklearn.model_selection import train_test_split
 from torch import Tensor
 
-from catboost_objectives_using_pytorch.custom_pytorch_objective import CustomPytorchObjective
+from treeboost_autograd.custom_pytorch_objective import CustomPytorchObjective
 
 
 def custom_regression_loss(preds: Tensor, targets: Tensor) -> Tensor:

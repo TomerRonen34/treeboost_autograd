@@ -5,7 +5,7 @@ from sklearn.model_selection import train_test_split
 from torch import Tensor
 from torch.nn import SoftMarginLoss
 
-from catboost_objectives_using_pytorch.custom_pytorch_objective import CustomPytorchObjective
+from treeboost_autograd.custom_pytorch_objective import CustomPytorchObjective
 
 
 def soft_margin_loss(preds: Tensor, targets: Tensor) -> Tensor:

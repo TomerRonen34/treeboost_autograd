@@ -1,8 +1,7 @@
-from typing import Callable, Sequence, List, Tuple
-
 import numpy as np
 import torch
 from torch import Tensor
+from typing import Callable, Sequence, List, Tuple
 
 
 class CustomPytorchObjective:

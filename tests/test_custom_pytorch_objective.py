@@ -1,13 +1,12 @@
-from typing import List, Tuple, Union, Callable
-
 import numpy as np
 import numpy.random as npr
 import pytest
 from torch import Tensor
 from torch.nn import BCEWithLogitsLoss, MSELoss
+from typing import List, Tuple, Union, Callable
 
-from catboost_objectives_using_pytorch.custom_pytorch_objective import CustomPytorchObjective
 from tests.official_objectives import OfficialLoglossObjective, OfficialMseObjective
+from treeboost_autograd.custom_pytorch_objective import CustomPytorchObjective
 
 
 class _TestParams:
