@@ -1,7 +1,6 @@
 from typing import Callable, Tuple
 
 import numpy as np
-import xgboost as xgb
 from torch import Tensor
 
 from treeboost_autograd.pytorch_objective import PytorchObjective

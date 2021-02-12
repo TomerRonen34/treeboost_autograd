@@ -1,7 +1,8 @@
+from typing import Callable, Sequence, Tuple
+
 import numpy as np
 import torch
 from torch import Tensor
-from typing import Callable, Sequence, List, Tuple
 
 
 class PytorchObjective:
@@ -16,7 +17,7 @@ class PytorchObjective:
                               targets: Sequence[float],
                               weights: Sequence[float] = None
                               ) -> Tuple[np.ndarray, np.ndarray]:
-        """  Calculates first and second derivatives of the objective (-loss) w.r.t preds.  """
+        """  Calculates first and second derivatives of the objective w.r.t preds.  """
         preds = torch.FloatTensor(preds).requires_grad_()
         targets = torch.FloatTensor(targets)
 

@@ -1,6 +1,5 @@
 from typing import Callable, Tuple
 
-import lightgbm as lgb
 import numpy as np
 from torch import Tensor
 
