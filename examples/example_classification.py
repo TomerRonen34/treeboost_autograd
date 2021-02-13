@@ -13,9 +13,7 @@ from catboost import CatBoostClassifier
 from lightgbm import LGBMClassifier
 from xgboost import XGBClassifier
 
-from treeboost_autograd.catboost_objective import CatboostObjective
-from treeboost_autograd.lightgbm_objective import LightGbmObjective
-from treeboost_autograd.xgboost_objective import XgboostObjective
+from treeboost_autograd.booster_objectives import CatboostObjective, LightGbmObjective, XgboostObjective
 
 
 def main():
@@ -38,7 +36,7 @@ def squared_hinge_loss(preds: Tensor, targets: Tensor) -> Tensor:
 
 
 def train_and_eval_custom_classifier(boosting_package: str, custom_loss_function: Callable[[Tensor, Tensor], Tensor],
-                                     n_estimators: int = 10, random_seed: int = 2021):
+                                     n_estimators: int = 10, random_seed: int = 2021) -> float:
     assert boosting_package in ["catboost", "xgboost", "lightgbm"]
     _print_title(boosting_package)
 

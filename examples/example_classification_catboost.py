@@ -10,7 +10,7 @@ import torch
 from torch import Tensor
 from torch.nn import SoftMarginLoss
 
-from treeboost_autograd.catboost_objective import CatboostObjective
+from treeboost_autograd.booster_objectives import CatboostObjective
 
 
 def soft_margin_loss(preds: Tensor, targets: Tensor) -> Tensor:
