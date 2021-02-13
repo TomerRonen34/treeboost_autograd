@@ -13,7 +13,7 @@ from catboost import CatBoostClassifier
 from lightgbm import LGBMClassifier
 from xgboost import XGBClassifier
 
-from treeboost_autograd.booster_objectives import CatboostObjective, LightGbmObjective, XgboostObjective
+from treeboost_autograd import CatboostObjective, LightGbmObjective, XgboostObjective
 
 
 def main():

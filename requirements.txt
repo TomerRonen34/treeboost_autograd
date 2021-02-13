@@ -1,6 +1,9 @@
-numpy
-catboost
-matplotlib
 torch
+catboost
+xgboost
+lightgbm
+
+numpy
+matplotlib
 pytest
 scikit_learn
