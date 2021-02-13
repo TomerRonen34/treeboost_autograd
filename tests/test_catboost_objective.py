@@ -5,8 +5,8 @@ from torch import Tensor
 from torch.nn import BCEWithLogitsLoss, MSELoss
 from typing import List, Tuple, Union, Callable
 
-from tests.official_objectives import OfficialLoglossObjective, OfficialMseObjective
-from treeboost_autograd.custom_pytorch_objective import CustomPytorchObjective
+from tests.official_catboost_objectives import OfficialLoglossObjective, OfficialMseObjective
+from treeboost_autograd.catboost_objective import CatboostObjective
 
 
 class _TestParams:
@@ -50,7 +50,7 @@ class _TestParams:
         return 0.5 * MSELoss(reduction="sum")(approxes, targets)
 
 
-class TestCustomPytorchObjective:
+class TestCatboostObjective:
     @pytest.mark.parametrize("approxes,targets,weights,official_objective,pytorch_loss_func",
                              _TestParams.generate_test_params())
     def test_calc_ders_range(self,
@@ -59,7 +59,7 @@ class TestCustomPytorchObjective:
                              weights: Union[np.ndarray, None],
                              official_objective: Union[OfficialLoglossObjective, OfficialMseObjective],
                              pytorch_loss_func: Callable[[Tensor, Tensor], Tensor]):
-        custom_pytorch_objective = CustomPytorchObjective(pytorch_loss_func)
+        custom_pytorch_objective = CatboostObjective(pytorch_loss_func)
         result_pytorch = custom_pytorch_objective.calc_ders_range(approxes, targets, weights)
         result_official = official_objective.calc_ders_range(approxes, targets, weights)
         assert np.allclose(result_official, result_pytorch, rtol=1e-4)
