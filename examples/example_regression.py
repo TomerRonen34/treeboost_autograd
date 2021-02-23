@@ -15,6 +15,7 @@ from treeboost_autograd import CatboostObjective, LightGbmObjective, XgboostObje
 
 
 def main():
+    _plot_custom_loss(dont_undershoot_loss)
     train_and_eval_custom_regressor("xgboost", dont_undershoot_loss, n_estimators=100)
     train_and_eval_custom_regressor("lightgbm", dont_undershoot_loss, n_estimators=100)
     train_and_eval_custom_regressor("catboost", dont_undershoot_loss, n_estimators=300)
@@ -127,9 +128,22 @@ def _print_title(boosting_package: str) -> None:
 
 def _generate_plot_title(boosting_package: str, mean_abs_rel_diff: float, undershoot_percentage: float) -> str:
     plot_title = f"{boosting_package} regressor\n" \
-                 f"mean_abs_rel_diff = {mean_abs_rel_diff:.2f}\n" \
-                 f"undershoot_percentage = {undershoot_percentage:.2f}"
+                 f"mean absolute relative difference = {mean_abs_rel_diff:.2f}\n" \
+                 f"undershoot percentage = {undershoot_percentage:.2f}"
     return plot_title
+
+
+def _plot_custom_loss(custom_loss_function: Callable) -> None:
+    preds = np.linspace(-0.5, 0.5, 101)
+    targets = np.zeros_like(preds)
+    with torch.no_grad():
+        loss = np.hstack([custom_loss_function(Tensor([p]), Tensor([t])).numpy()
+                          for p, t in zip(preds, targets)])
+    plt.plot(preds, loss)
+    plt.title("Custom regression loss function - don't undershoot!")
+    plt.xlabel("diff = (preds - targets)")
+    plt.ylabel("loss")
+    plt.show()
 
 
 if __name__ == '__main__':
