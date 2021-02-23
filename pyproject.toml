@@ -1,0 +1,26 @@
+[build-system]
+requires = ["flit_core >=2,<4"]
+build-backend = "flit_core.buildapi"
+
+[tool.flit.metadata]
+module = "treeboost_autograd"
+author = "Tomer Ronen"
+author-email = "tomer.ronen34@gmail.com"
+home-page = "https://github.com/TomerRonen34/treeboost_autograd"
+classifiers = ["License :: OSI Approved :: MIT License"]
+description-file = "README.md"
+
+requires = [
+    "numpy",
+    "torch",
+]
+
+[tool.flit.metadata.requires-extra]
+dev = [
+    "catboost",
+    "xgboost",
+    "lightgbm",
+    "matplotlib",
+    "pytest",
+    "scikit_learn"
+]

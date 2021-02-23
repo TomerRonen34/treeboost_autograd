@@ -11,7 +11,7 @@ Check out the post in Towards Data Science: https://towardsdatascience.com/easy-
 ## Usage
 Usage is very similar for all boosting libraries:\
 `from treeboost_autograd import CatboostObjective, LightGbmObjective, XgboostObjective`\
-See `examples/example_classification.py` and `examples\example_regression.py` for ready-to-run examples.
+Ready-to-run examples are available at the Git repo: https://github.com/TomerRonen34/treeboost_autograd/tree/main/examples
 
 `pip install treeboost_autograd`
 ```python
