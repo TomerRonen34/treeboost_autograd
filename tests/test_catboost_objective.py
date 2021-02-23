@@ -1,9 +1,10 @@
+from typing import List, Tuple, Union, Callable
+
 import numpy as np
 import numpy.random as npr
 import pytest
 from torch import Tensor
 from torch.nn import BCEWithLogitsLoss, MSELoss
-from typing import List, Tuple, Union, Callable
 
 from tests.official_catboost_objectives import OfficialLoglossObjective, OfficialMseObjective
 from treeboost_autograd.booster_objectives import CatboostObjective
