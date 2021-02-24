@@ -7,10 +7,6 @@ from sklearn.datasets import load_boston
 from sklearn.model_selection import train_test_split
 from torch import Tensor
 
-from catboost import CatBoostRegressor
-from lightgbm import LGBMRegressor
-from xgboost import XGBRegressor
-
 from treeboost_autograd import CatboostObjective, LightGbmObjective, XgboostObjective
 
 
@@ -35,29 +31,33 @@ def dont_undershoot_loss(preds: Tensor, targets: Tensor) -> Tensor:
 def train_and_eval_custom_regressor(boosting_package: str, custom_loss_function: Callable[[Tensor, Tensor], Tensor],
                                     n_estimators: int, random_seed: int = 2021, is_plot: bool = True
                                     ) -> Tuple[float, float]:
-    assert boosting_package in ["catboost", "xgboost", "lightgbm"]
-    _print_title(boosting_package)
+    try:
+        assert boosting_package in ["catboost", "xgboost", "lightgbm"]
+        _print_title(boosting_package)
 
-    X, y = load_boston(return_X_y=True)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=2021)
+        X, y = load_boston(return_X_y=True)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=2021)
 
-    model = _fit_custom_regressor(boosting_package,
-                                  X_train, y_train, custom_loss_function,
-                                  n_estimators, random_seed)
+        model = _fit_custom_regressor(boosting_package,
+                                      X_train, y_train, custom_loss_function,
+                                      n_estimators, random_seed)
 
-    pred_test = model.predict(X_test)
-    mean_abs_rel_diff = _calc_mean_absolute_relative_difference(pred_test, y_test)
-    undershoot_percentage = _calc_undershoot_percentage(pred_test, y_test)
+        pred_test = model.predict(X_test)
+        mean_abs_rel_diff = _calc_mean_absolute_relative_difference(pred_test, y_test)
+        undershoot_percentage = _calc_undershoot_percentage(pred_test, y_test)
 
-    if is_plot:
-        plot_title = _generate_plot_title(boosting_package, mean_abs_rel_diff, undershoot_percentage)
-        _plot_relative_difference(pred_test, y_test, title=plot_title)
+        if is_plot:
+            plot_title = _generate_plot_title(boosting_package, mean_abs_rel_diff, undershoot_percentage)
+            _plot_relative_difference(pred_test, y_test, title=plot_title)
 
-    return mean_abs_rel_diff, undershoot_percentage
+        return mean_abs_rel_diff, undershoot_percentage
+
+    except ImportError:
+        print(f"Woops! We can't run the example for '{boosting_package}', probably because it isn't installed")
 
 
 def _fit_custom_regressor(boosting_package: str, *args, **kwargs
-                          ) -> Union[CatBoostRegressor, XGBRegressor, LGBMRegressor]:
+                          ) -> Union["CatBoostRegressor", "XGBRegressor", "LGBMRegressor"]:
     boosting_package_2_fit_function = {"catboost": _fit_custom_catboost_regressor,
                                        "xgboost": _fit_custom_xgboost_regressor,
                                        "lightgbm": _fit_custom_lightgbm_regressor}
@@ -67,7 +67,8 @@ def _fit_custom_regressor(boosting_package: str, *args, **kwargs
 
 def _fit_custom_catboost_regressor(X_train: np.ndarray, y_train: np.ndarray, custom_loss_function: Callable,
                                    n_estimators: int, random_seed: int
-                                   ) -> CatBoostRegressor:
+                                   ) -> "CatBoostRegressor":
+    from catboost import CatBoostRegressor
     custom_objective = CatboostObjective(loss_function=custom_loss_function)
     model = CatBoostRegressor(loss_function=custom_objective, n_estimators=n_estimators, random_seed=random_seed,
                               eval_metric="MAE", allow_writing_files=False)
@@ -77,7 +78,8 @@ def _fit_custom_catboost_regressor(X_train: np.ndarray, y_train: np.ndarray, cus
 
 def _fit_custom_xgboost_regressor(X_train: np.ndarray, y_train: np.ndarray, custom_loss_function: Callable,
                                   n_estimators: int, random_seed: int
-                                  ) -> XGBRegressor:
+                                  ) -> "XGBRegressor":
+    from xgboost import XGBRegressor
     custom_objective = XgboostObjective(loss_function=custom_loss_function)
     model = XGBRegressor(objective=custom_objective, n_estimators=n_estimators, random_state=random_seed)
     model.fit(X_train, y_train, eval_metric="mae", eval_set=[(X_train, y_train)], verbose=True)
@@ -86,7 +88,8 @@ def _fit_custom_xgboost_regressor(X_train: np.ndarray, y_train: np.ndarray, cust
 
 def _fit_custom_lightgbm_regressor(X_train: np.ndarray, y_train: np.ndarray, custom_loss_function: Callable,
                                    n_estimators: int, random_seed: int
-                                   ) -> LGBMRegressor:
+                                   ) -> "LGBMRegressor":
+    from lightgbm import LGBMRegressor
     custom_objective = LightGbmObjective(loss_function=custom_loss_function)
     model = LGBMRegressor(objective=custom_objective, n_estimators=n_estimators, random_state=random_seed)
     model.fit(X_train, y_train, eval_metric="mae", eval_set=(X_train, y_train), verbose=True)

@@ -9,10 +9,6 @@ from sklearn.model_selection import train_test_split
 from torch import Tensor
 from torch.nn import SoftMarginLoss
 
-from catboost import CatBoostClassifier
-from lightgbm import LGBMClassifier
-from xgboost import XGBClassifier
-
 from treeboost_autograd import CatboostObjective, LightGbmObjective, XgboostObjective
 
 
@@ -37,25 +33,29 @@ def squared_hinge_loss(preds: Tensor, targets: Tensor) -> Tensor:
 
 def train_and_eval_custom_classifier(boosting_package: str, custom_loss_function: Callable[[Tensor, Tensor], Tensor],
                                      n_estimators: int = 10, random_seed: int = 2021) -> float:
-    assert boosting_package in ["catboost", "xgboost", "lightgbm"]
-    _print_title(boosting_package)
+    try:
+        assert boosting_package in ["catboost", "xgboost", "lightgbm"]
+        _print_title(boosting_package)
 
-    X, y = load_breast_cancer(return_X_y=True)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=random_seed)
+        X, y = load_breast_cancer(return_X_y=True)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=random_seed)
 
-    model = _fit_custom_classifier(boosting_package,
-                                   X_train, y_train, custom_loss_function,
-                                   n_estimators, random_seed)
+        model = _fit_custom_classifier(boosting_package,
+                                       X_train, y_train, custom_loss_function,
+                                       n_estimators, random_seed)
 
-    pred_test = model.predict(X_test)
-    macro_f1_score = f1_score(y_test, pred_test, average="macro")
+        pred_test = model.predict(X_test)
+        macro_f1_score = f1_score(y_test, pred_test, average="macro")
 
-    print(classification_report(y_test, pred_test))
-    return macro_f1_score
+        print(classification_report(y_test, pred_test))
+        return macro_f1_score
+
+    except ImportError:
+        print(f"Woops! We can't run the example for '{boosting_package}', probably because it isn't installed")
 
 
 def _fit_custom_classifier(boosting_package: str, *args, **kwargs
-                           ) -> Union[CatBoostClassifier, XGBClassifier, LGBMClassifier]:
+                           ) -> Union["CatBoostClassifier", "XGBClassifier", "LGBMClassifier"]:
     boosting_package_2_fit_function = {"catboost": _fit_custom_catboost_classifier,
                                        "xgboost": _fit_custom_xgboost_classifier,
                                        "lightgbm": _fit_custom_lightgbm_classifier}
@@ -65,7 +65,8 @@ def _fit_custom_classifier(boosting_package: str, *args, **kwargs
 
 def _fit_custom_catboost_classifier(X_train: np.ndarray, y_train: np.ndarray, custom_loss_function: Callable,
                                     n_estimators: int, random_seed: int
-                                    ) -> CatBoostClassifier:
+                                    ) -> "CatBoostClassifier":
+    from catboost import CatBoostClassifier
     custom_objective = CatboostObjective(loss_function=custom_loss_function)
     model = CatBoostClassifier(loss_function=custom_objective, n_estimators=n_estimators, random_seed=random_seed,
                                eval_metric="ZeroOneLoss", allow_writing_files=False)
@@ -75,7 +76,8 @@ def _fit_custom_catboost_classifier(X_train: np.ndarray, y_train: np.ndarray, cu
 
 def _fit_custom_xgboost_classifier(X_train: np.ndarray, y_train: np.ndarray, custom_loss_function: Callable,
                                    n_estimators: int, random_seed: int
-                                   ) -> XGBClassifier:
+                                   ) -> "XGBClassifier":
+    from xgboost import XGBClassifier
     custom_objective = XgboostObjective(loss_function=custom_loss_function)
     model = XGBClassifier(objective=custom_objective, n_estimators=n_estimators, random_state=random_seed)
     model.fit(X_train, y_train, eval_metric="error", eval_set=[(X_train, y_train)], verbose=True)
@@ -84,7 +86,8 @@ def _fit_custom_xgboost_classifier(X_train: np.ndarray, y_train: np.ndarray, cus
 
 def _fit_custom_lightgbm_classifier(X_train: np.ndarray, y_train: np.ndarray, custom_loss_function: Callable,
                                     n_estimators: int, random_seed: int
-                                    ) -> LGBMClassifier:
+                                    ) -> "LGBMClassifier":
+    from lightgbm import LGBMClassifier
     custom_objective = LightGbmObjective(loss_function=custom_loss_function)
     model = LGBMClassifier(objective=custom_objective, n_estimators=n_estimators, random_state=random_seed)
     model.fit(X_train, y_train, eval_metric="binary_error", eval_set=(X_train, y_train), verbose=True)
