@@ -15,14 +15,21 @@ class SklearnStyleObjective(PytorchObjective):
 
 
 class LightGbmObjective(SklearnStyleObjective):
+    """ ready-to-run examples for regression and binary classification can be found here:
+        https://github.com/TomerRonen34/treeboost_autograd/tree/main/examples """
     pass
 
 
 class XgboostObjective(SklearnStyleObjective):
+    """ ready-to-run examples for regression and binary classification can be found here:
+        https://github.com/TomerRonen34/treeboost_autograd/tree/main/examples """
     pass
 
 
 class CatboostObjective(PytorchObjective):
+    """ ready-to-run examples for regression and binary classification can be found here:
+        https://github.com/TomerRonen34/treeboost_autograd/tree/main/examples """
+
     def __init__(self, loss_function: Callable[[Tensor, Tensor], Tensor]):
         super().__init__(loss_function, use_minus_loss_as_objective=True)
 

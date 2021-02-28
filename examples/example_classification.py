@@ -7,21 +7,18 @@ from sklearn.metrics import classification_report
 from sklearn.metrics import f1_score
 from sklearn.model_selection import train_test_split
 from torch import Tensor
-from torch.nn import SoftMarginLoss
+from torch.nn import BCEWithLogitsLoss
 
 from treeboost_autograd import CatboostObjective, LightGbmObjective, XgboostObjective
 
 
 def main():
-    train_and_eval_custom_classifier(boosting_package="catboost", custom_loss_function=squared_hinge_loss)
-    train_and_eval_custom_classifier(boosting_package="xgboost", custom_loss_function=squared_hinge_loss)
-    train_and_eval_custom_classifier(boosting_package="lightgbm", custom_loss_function=squared_hinge_loss)
-
-
-def soft_margin_loss(preds: Tensor, targets: Tensor) -> Tensor:
-    targets = 2 * targets - 1
-    loss = SoftMarginLoss(reduction="sum")(preds, targets)
-    return loss
+    """ You can run this example as-is even if you don't have all the boosting packages installed """
+    custom_loss_function = squared_hinge_loss
+    # custom_loss_function = BCEWithLogitsLoss(reduction="sum")
+    train_and_eval_custom_classifier("catboost", custom_loss_function)
+    train_and_eval_custom_classifier("xgboost", custom_loss_function)
+    train_and_eval_custom_classifier("lightgbm", custom_loss_function)
 
 
 def squared_hinge_loss(preds: Tensor, targets: Tensor) -> Tensor:

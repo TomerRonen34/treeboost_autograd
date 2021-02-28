@@ -6,15 +6,19 @@ import torch
 from sklearn.datasets import load_boston
 from sklearn.model_selection import train_test_split
 from torch import Tensor
+from torch.nn import MSELoss
 
 from treeboost_autograd import CatboostObjective, LightGbmObjective, XgboostObjective
 
 
 def main():
-    _plot_custom_loss(dont_undershoot_loss)
-    train_and_eval_custom_regressor("xgboost", dont_undershoot_loss, n_estimators=100)
-    train_and_eval_custom_regressor("lightgbm", dont_undershoot_loss, n_estimators=100)
-    train_and_eval_custom_regressor("catboost", dont_undershoot_loss, n_estimators=300)
+    """ You can run this example as-is even if you don't have all the boosting packages installed """
+    custom_loss_function = dont_undershoot_loss
+    # custom_loss_function = MSELoss(reduction="sum")
+    _plot_custom_loss(custom_loss_function)
+    train_and_eval_custom_regressor("xgboost", custom_loss_function, n_estimators=100)
+    train_and_eval_custom_regressor("lightgbm", custom_loss_function, n_estimators=100)
+    train_and_eval_custom_regressor("catboost", custom_loss_function, n_estimators=300)
 
 
 def dont_undershoot_loss(preds: Tensor, targets: Tensor) -> Tensor:
